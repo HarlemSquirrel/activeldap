@@ -13,13 +13,18 @@ module ActiveLdap
       @must = []
       @may = []
       @object_classes = []
+
       register(schema.attribute('objectClass')) if schema
+
+      # Add all attributes to may for extensibleObject entries
+      # @may = schema.attributes if object_classes.include? 'extensibleObject'
+
       object_classes.each do |objc|
         # get all attributes for the class
         object_class = schema.object_class(objc)
         @object_classes << object_class
         @must.concat(object_class.must)
-        @may.concat(object_class.may)
+        @may.concat(object_class.may) # We can probably skip this as well if we're using all attributes
       end
       @must.uniq!
       @may.uniq!
